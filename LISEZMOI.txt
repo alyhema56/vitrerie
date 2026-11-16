@@ -1,0 +1,4 @@
+SITE HTML - Vitrerie Belleville Inox
+Pages : index.html (accueil), realisations.html, contact.html. Dossier images/ = photos (photo.webp + miniature th-photo.webp).
+Ajouter une photo : 1) envoyez la photo et sa miniature (800 px de large) dans images/ ; 2) dans index.html et realisations.html, copiez un bloc <figure class="mcard"> existant, collez-le dans la rangée et changez le nom du fichier, le titre et la catégorie.
+Changer un numéro : cherchez 74501181 (WhatsApp) et 71317922 (appel) dans les 3 fichiers .html et assets/js/contact.js.
