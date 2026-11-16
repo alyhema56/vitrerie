@@ -231,16 +231,14 @@ html:not(.js) .marquee{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
 .mcard:focus-visible{outline:3px solid var(--cu);outline-offset:3px}
 .footer p a,.infos a{text-decoration:none}.footer p a:hover,.infos a:hover{text-decoration:underline}
 
-/* Logo HBS : médaillon rond (anneau cuivre, ombre douce) ; en-tête = emblème qui déborde légèrement sous la barre, pied de page = logo complet */
-.logo{height:70px;gap:1rem}
-.logo-round{display:block;flex:none;width:88px;height:88px;border-radius:50%;background:#fff;border:3px solid var(--cu);overflow:hidden;
-  box-shadow:0 0 0 3px rgba(255,255,255,.9),0 8px 22px rgba(10,25,35,.38);transform:translateY(12px);transition:transform .25s,box-shadow .25s}
-.logo:hover .logo-round{transform:translateY(10px) scale(1.04)}
+/* Logo HBS : en-tête compact (médaillon rond dans la barre + nom sur deux lignes), pied de page = logo complet en médaillon */
+.logo{height:70px;gap:.8rem}
+.logo-round{display:block;flex:none;width:54px;height:54px;border-radius:50%;background:#fff;border:2px solid var(--cu);overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 .logo-round img{display:block;width:100%;height:100%;object-fit:cover}
-.logo-txt{font:700 1.5rem var(--hf);color:#fff;letter-spacing:.2px}
-.foot-logo{display:block;width:200px;height:200px;border-radius:50%;background:#fff;border:4px solid var(--cu);overflow:hidden;
-  box-shadow:0 0 0 5px rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.4);margin-bottom:1.2rem}
+.logo-txt{display:flex;flex-direction:column;line-height:1.05}
+.logo-txt b{font:700 1.35rem var(--hf);color:#fff;letter-spacing:.3px;white-space:nowrap}
+.logo-txt small{font:500 .66rem var(--bf);letter-spacing:.13em;text-transform:uppercase;color:var(--glass);margin-top:4px;white-space:nowrap}
+.foot-logo{display:block;width:150px;height:150px;border-radius:50%;background:#fff;border:3px solid var(--cu);overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.35);margin-bottom:1.1rem}
 .foot-logo img{display:block;width:100%;height:100%;object-fit:cover}
-@media(max-width:1100px){.logo-txt{display:none}}
-@media(max-width:600px){.logo-round{width:68px;height:68px;border-width:2px;transform:translateY(9px)}.foot-logo{width:170px;height:170px}}
-@media(prefers-reduced-motion:reduce){.logo:hover .logo-round{transform:translateY(12px)}}
+@media(min-width:769px) and (max-width:999px){.logo-txt{display:none}}
+@media(max-width:768px){.logo-round{width:46px;height:46px}.logo-txt b{font-size:1.15rem}.logo-txt small{display:none}.logo{gap:.65rem}}
