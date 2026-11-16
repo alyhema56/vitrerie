@@ -3,6 +3,7 @@ document.getElementById('cform').addEventListener('submit', function (e) {
   if (e.defaultPrevented) return;
   e.preventDefault();
   var f = e.target.elements;
-  var txt = 'Bonjour, je suis ' + f.nom.value.trim() + ' (tél : ' + f.tel.value.trim() + (f.email.value.trim() ? ', e-mail : ' + f.email.value.trim() : '') + ').\n' + f.message.value.trim();
+  var txt = 'Bonjour, je suis ' + f.nom.value.trim() + ' (tél : ' + f.tel.value.trim() + (f.email.value.trim() ? ', e-mail : ' + f.email.value.trim() : '') + ').\n' + (f.type && f.type.value ? 'Type de travaux : ' + f.type.value + '\n' : '') + f.message.value.trim();
+  if (window.vbTrack) window.vbTrack('formulaire');
   window.location.href = 'https://wa.me/22674501181?text=' + encodeURIComponent(txt);
 });

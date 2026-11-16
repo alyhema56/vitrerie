@@ -2,3 +2,12 @@ SITE HTML - Vitrerie Belleville Inox
 Pages : index.html (accueil), realisations.html, contact.html. Dossier images/ = photos (photo.webp + miniature th-photo.webp).
 Ajouter une photo : 1) envoyez la photo et sa miniature (800 px de large) dans images/ ; 2) dans index.html et realisations.html, copiez un bloc <figure class="mcard"> existant, collez-le dans la rangée et changez le nom du fichier, le titre et la catégorie.
 Changer un numéro : cherchez 74501181 (WhatsApp) et 71317922 (appel) dans les 3 fichiers .html et assets/js/contact.js.
+
+--- MISE À JOUR (version 6) ---
+1) NOM DE DOMAINE : les balises de référencement (canonical, og:image, sitemap.xml, robots.txt, données structurées) contiennent l'adresse provisoire https://VOTRE-DOMAINE. Remplacez-la par l'adresse réelle du site, par exemple (dans le dossier du site) :
+   grep -rl "VOTRE-DOMAINE" . | xargs sed -i 's#https://VOTRE-DOMAINE#https://www.monsite.com#g'
+   (si vous restez sur GitHub Pages : https://NOM-UTILISATEUR.github.io/NOM-DU-DEPOT)
+2) MESURE DES CLICS : le site envoie déjà les événements appel, whatsapp, devis et formulaire. Il suffit d'ajouter, dans le <head> des 3 pages, le script de l'outil choisi (Plausible, Umami ou Google Analytics). Sans script, rien n'est envoyé.
+3) ICÔNES : le sprite SVG est copié dans chaque page (bloc <svg width="0" ...>). Pour ajouter une icône, copiez un <symbol> depuis fontawesome.com (gratuit) et appelez-la avec <svg class="ic"><use href="#i-nom"/></svg>.
+4) L'écran de chargement a été supprimé (il retardait l'affichage). Font Awesome (bibliothèque complète) a été remplacé par ces icônes SVG.
+5) LOGO : images/logo.webp (complet, pied de page), images/logo-emblem.webp (HBS seul, en-tête), favicon-32.png et apple-touch-icon.png (icône d'onglet). Pour changer le logo, remplacez ces fichiers en gardant les mêmes noms.

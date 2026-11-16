@@ -3,11 +3,6 @@ document.documentElement.classList.add('js');
 (function () {
   const $ = (s, c = document) => c.querySelector(s), $$ = (s, c = document) => [...c.querySelectorAll(s)];
 
-  /* Loader */
-  const hideLoader = () => { const l = $('#loader'); if (l) { l.classList.add('done'); setTimeout(() => l.remove(), 800); } };
-  window.addEventListener('load', () => setTimeout(hideLoader, 350));
-  setTimeout(hideLoader, 3000);
-
   /* Navigation : transparente puis pleine au scroll + burger */
   const nav = $('#nav'), burger = $('#burger'), menu = $('#menu');
   const onScroll = () => nav.classList.toggle('solid', scrollY > 40);
@@ -69,23 +64,28 @@ document.documentElement.classList.add('js');
   /* Slider du header (hero) : fondu automatique */
   const hsl = $$('#heroSlides .hs');
   if (hsl.length) {
-    const dots = $('#hdots'); let h = 0, ht;
+    const dots = $('#hdots'); let h = 0, ht, hpaused = matchMedia('(prefers-reduced-motion: reduce)').matches;
     hsl.forEach((_, i) => { const b = document.createElement('button'); b.setAttribute('aria-label', 'Image ' + (i + 1)); b.onclick = () => hgo(i, true); dots.appendChild(b); });
     const hgo = (i, manual) => {
       h = (i + hsl.length) % hsl.length;
       hsl.forEach((s, k) => s.classList.toggle('on', k === h));
       $$('button', dots).forEach((d, k) => d.classList.toggle('on', k === h));
-      if (manual) { clearInterval(ht); ht = setInterval(() => hgo(h + 1), 5000); }
+      if (manual) { clearInterval(ht); if (!hpaused) ht = setInterval(() => hgo(h + 1), 5000); }
     };
     $('#hprev').onclick = () => hgo(h - 1, true); $('#hnext').onclick = () => hgo(h + 1, true);
-    hgo(0); ht = setInterval(() => hgo(h + 1), 5000);
+    hgo(0);
+    const hp = $('#hpause');
+    const setP = p => { hpaused = p; clearInterval(ht); if (!p) ht = setInterval(() => hgo(h + 1), 5000);
+      if (hp) { hp.setAttribute('aria-label', p ? 'Relancer le diaporama' : 'Mettre le diaporama en pause'); hp.querySelector('use').setAttribute('href', p ? '#i-play' : '#i-pause'); } };
+    if (hp) hp.addEventListener('click', () => setP(!hpaused));
+    setP(hpaused);
   }
 
   /* Filtres de la galerie + lecture vidéo au survol */
   const fl = $('#filters');
   if (fl) fl.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
-    $$('button', fl).forEach(x => x.classList.toggle('on', x === b));
+    $$('button', fl).forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
     $$('#gal [data-t]').forEach(g => g.classList.toggle('hide', b.dataset.f !== 'all' && g.dataset.t !== b.dataset.f));
   });
   $$('.gi video, .slide video').forEach(v => { v.parentElement.addEventListener('mouseenter', () => v.play().catch(() => {})); });
@@ -95,9 +95,10 @@ document.documentElement.classList.add('js');
   if (f) f.addEventListener('submit', e => {
     let ok = true;
     const rules = { nom: v => v.trim().length >= 2, tel: v => /^[0-9 +().-]{8,20}$/.test(v), email: v => !v || /^\S+@\S+\.\S+$/.test(v), message: v => v.trim().length >= 10 };
-    Object.keys(rules).forEach(n => { const el = f.elements[n]; const good = rules[n](el.value); el.classList.toggle('field-err', !good); if (!good) ok = false; });
+    Object.keys(rules).forEach(n => { const el = f.elements[n]; const good = rules[n](el.value); el.classList.toggle('field-err', !good); el.setAttribute('aria-invalid', !good); const er = $('#e-' + n); if (er) er.hidden = good; if (!good) ok = false; });
     if (!ok) { e.preventDefault(); $('.field-err', f).focus(); }
   });
+  if (f) f.addEventListener('input', e => { const el = e.target; if (el.classList.contains('field-err')) { el.classList.remove('field-err'); el.removeAttribute('aria-invalid'); const er = $('#e-' + el.name); if (er) er.hidden = true; } });
 })();
 
 /* Galerie défilante : défilement continu infini (requestAnimationFrame) + balayage au doigt / glissé à la souris */
@@ -109,7 +110,7 @@ document.documentElement.classList.add('js');
     if (!orig.length) return;
     orig.forEach((el, i) => { el.dataset.i = i; });   // repère pour l'agrandissement
     const dir = +root.dataset.dir || -1, speed = reduce ? 0 : (+root.dataset.speed || 38);
-    let setW = 0, x = 0, vx = 0, drag = false, moved = false, visible = true, lastT = 0;
+    let held = false, setW = 0, x = 0, vx = 0, drag = false, moved = false, visible = true, lastT = 0;
     let startX = 0, startPos = 0, lastX = 0, lastTm = 0, v = 0;
 
     const wrap = () => { if (!setW) return; x = x % setW; if (x > 0) x -= setW; };   // x reste dans ]-setW ; 0]
@@ -122,7 +123,7 @@ document.documentElement.classList.add('js');
       if (!setW) return;
       const copies = Math.ceil(root.clientWidth * 2 / setW) + 1;
       for (let c = 0; c < copies; c++) orig.forEach(el => {
-        const n = el.cloneNode(true); n.dataset.clone = '1'; n.setAttribute('aria-hidden', 'true'); track.appendChild(n);
+        const n = el.cloneNode(true); n.dataset.clone = '1'; n.setAttribute('aria-hidden', 'true'); n.removeAttribute('tabindex'); n.removeAttribute('role'); n.removeAttribute('aria-label'); track.appendChild(n);
       });
       wrap(); paint();
     }
@@ -130,7 +131,7 @@ document.documentElement.classList.add('js');
     function frame(t) {
       if (!lastT) lastT = t;
       const dt = Math.min((t - lastT) / 1000, 0.05); lastT = t;
-      if (visible && !drag && setW) {
+      if (visible && !drag && setW && !window.mqPaused && !held) {
         x += (dir * speed + vx) * dt;          // vitesse auto + élan du dernier balayage
         vx *= Math.pow(0.03, dt);              // l'élan s'éteint en douceur, sans à-coup
         if (Math.abs(vx) < 1) vx = 0;
@@ -158,7 +159,16 @@ document.documentElement.classList.add('js');
     };
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => root.addEventListener(ev, end));
     root.addEventListener('dragstart', e => e.preventDefault());
-    root.addEventListener('click', e => { if (moved) return; const c = e.target.closest('.mcard'); if (c && window.openLightbox) window.openLightbox(root, c); });
+    root.addEventListener('focusin', e => {          // navigation au clavier : on arrête le défilement et on ramène la carte dans le cadre
+      const c = e.target.closest('.mcard'); if (!c) return;
+      try { if (!e.target.matches(':focus-visible')) return; } catch (_) {}
+      held = true; root.scrollLeft = 0;
+      const rr = root.getBoundingClientRect(), cr = c.getBoundingClientRect();
+      if (cr.left < rr.left) x += rr.left - cr.left + 8; else if (cr.right > rr.right) x -= cr.right - rr.right + 8;
+      wrap(); paint();
+    });
+    root.addEventListener('focusout', () => { held = false; });
+    root.addEventListener('click', e => { if (moved && e.detail !== 0) return; const c = e.target.closest('.mcard'); if (c && window.openLightbox) window.openLightbox(root, c); });
 
     new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { threshold: 0 }).observe(root);
     let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 150); });
@@ -168,16 +178,17 @@ document.documentElement.classList.add('js');
 
 /* Agrandissement d'une photo : toucher / cliquer, flèches, balayage, Échap */
 (function () {
-  let box, img, cap, list = [], idx = 0, x0 = null;
+  let box, img, cap, list = [], idx = 0, x0 = null, opener = null;
   function build() {
     box = document.createElement('div'); box.className = 'lb'; box.hidden = true;
-    box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Agrandissement de la photo');
     box.innerHTML = '<button class="lb-x" aria-label="Fermer">&times;</button><button class="lb-p" aria-label="Précédente">&#8249;</button><figure><img alt=""><figcaption></figcaption></figure><button class="lb-n" aria-label="Suivante">&#8250;</button>';
     document.body.appendChild(box); img = box.querySelector('img'); cap = box.querySelector('figcaption');
     box.addEventListener('click', e => { if (e.target.closest('.lb-p')) go(-1); else if (e.target.closest('.lb-n')) go(1); else if (!e.target.closest('img')) close(); });
     box.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
     box.addEventListener('touchend', e => { if (x0 === null) return; const d = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(d) > 50) go(d < 0 ? 1 : -1); });
-    document.addEventListener('keydown', e => { if (box.hidden) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+    document.addEventListener('keydown', e => { if (box.hidden) return; if (e.key === 'Escape') close();
+      if (e.key === 'Tab') { const fs = Array.from(box.querySelectorAll('button')), i = fs.indexOf(document.activeElement); e.preventDefault(); fs[(i + (e.shiftKey ? -1 : 1) + fs.length) % fs.length].focus(); } if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
   }
   function show() {
     const c = list[idx], im = c.querySelector('img'), b = c.querySelector('b'), s = c.querySelector('span');
@@ -185,12 +196,34 @@ document.documentElement.classList.add('js');
     cap.textContent = (b ? b.textContent : '') + (s ? ' · ' + s.textContent : '');
   }
   function go(d) { idx = (idx + d + list.length) % list.length; show(); }
-  function close() { box.hidden = true; document.body.style.overflow = ''; img.removeAttribute('src'); }
+  function close() { box.hidden = true; document.body.style.overflow = ''; img.removeAttribute('src'); if (opener && opener.focus) { try { opener.focus({ preventScroll: true }); } catch (_) {} } opener = null; }
   window.openLightbox = function (group, card) {
     if (!box) build();
     list = Array.from(group.querySelectorAll('.mcard:not([data-clone])')).filter(c => !c.classList.contains('hide'));
     idx = card.dataset.i ? +card.dataset.i : list.indexOf(card); if (idx < 0) idx = 0;
-    show(); box.hidden = false; document.body.style.overflow = 'hidden';
+    opener = document.activeElement; show(); box.hidden = false; document.body.style.overflow = 'hidden'; box.querySelector('.lb-x').focus();
   };
   document.addEventListener('click', e => { const c = e.target.closest('.mstatic .mcard, .mgrid .mcard'); if (c) window.openLightbox(c.parentElement, c); });
+})();
+
+/* Accessibilité et mesure : activation des cartes au clavier, pause du défilement, suivi des clics */
+(function () {
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest && e.target.closest('.mcard'); if (!c) return;
+    e.preventDefault(); c.click();
+  });
+  const mp = document.getElementById('mpause');
+  if (mp) {
+    const label = mp.querySelector('span'), use = mp.querySelector('use');
+    const set = p => { window.mqPaused = p; label.textContent = p ? 'Lecture' : 'Pause'; use.setAttribute('href', p ? '#i-play' : '#i-pause');
+      mp.setAttribute('aria-label', p ? 'Relancer le défilement des photos' : 'Mettre en pause le défilement des photos'); };
+    mp.addEventListener('click', () => set(!window.mqPaused));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) set(true);
+  }
+  /* Suivi : envoie l'événement à l'outil de mesure s'il est installé (Plausible, Umami ou Google Analytics), sinon ne fait rien */
+  window.vbTrack = function (name) {
+    try { if (window.plausible) window.plausible(name); else if (window.umami) window.umami.track(name); else if (window.gtag) window.gtag('event', name); } catch (_) {}
+  };
+  document.addEventListener('click', e => { const t = e.target.closest('[data-track]'); if (t) window.vbTrack(t.dataset.track); });
 })();
