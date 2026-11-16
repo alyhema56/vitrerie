@@ -11,3 +11,8 @@ Changer un numéro : cherchez 74501181 (WhatsApp) et 71317922 (appel) dans les 3
 3) ICÔNES : le sprite SVG est copié dans chaque page (bloc <svg width="0" ...>). Pour ajouter une icône, copiez un <symbol> depuis fontawesome.com (gratuit) et appelez-la avec <svg class="ic"><use href="#i-nom"/></svg>.
 4) L'écran de chargement a été supprimé (il retardait l'affichage). Font Awesome (bibliothèque complète) a été remplacé par ces icônes SVG.
 5) LOGO : images/logo-round-emblem.webp (médaillon de l'en-tête), images/logo-round.webp (médaillon du pied de page), images/logo.webp (logo complet, données Google), favicon-32.png et apple-touch-icon.png. Pour changer le logo, remplacez ces fichiers en gardant les mêmes noms ; la forme ronde est faite par le CSS (classes .logo-round et .foot-logo) ; la taille se règle dans assets/css/style.css, tout en bas.
+
+--- MISE À JOUR (version 7) ---
+1) AVIS CLIENTS : carrousel automatique (un avis à la fois, 6 s, barre de progression, flèches, points, balayage au doigt, pause au survol et bouton pause). Pour ajouter un avis : dans index.html, copiez un bloc <figure class="tq"> dans #tslTrack et changez le texte, le nom, le métier et les initiales (le carrousel s'adapte tout seul). N'affichez que de vrais avis de clients.
+2) RESPONSABLE : nouvelle section « HEMA B Souleymane, responsable de l'atelier » juste après les avis, même disposition que « Un métier de précision ». Photo : images/responsable-atelier.webp (remplaçable en gardant le même nom). Textes modifiables dans index.html (#responsable).
+3) LOGO : nouveau logo rond remplacé dans images/logo-round-emblem.webp, logo-round.webp, logo.webp, favicon-32.png, apple-touch-icon.png.

@@ -227,3 +227,40 @@ document.documentElement.classList.add('js');
   };
   document.addEventListener('click', e => { const t = e.target.closest('[data-track]'); if (t) window.vbTrack(t.dataset.track); });
 })();
+
+/* Avis clients : défilement automatique, flèches, points, balayage, pause (survol, focus, bouton) */
+(function () {
+  const root = document.getElementById('tsl'); if (!root) return;
+  const track = document.getElementById('tslTrack'), slides = Array.from(track.children), dotsBox = document.getElementById('tdots');
+  const btnP = document.getElementById('tpause'), DUR = 6000;
+  let i = 0, timer = null, userPaused = matchMedia('(prefers-reduced-motion: reduce)').matches, hover = false, focus = false, x0 = null;
+  slides.forEach((_, k) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Avis ' + (k + 1)); b.onclick = () => go(k, true); dotsBox.appendChild(b); });
+  const dots = Array.from(dotsBox.children);
+  root.style.setProperty('--tdur', DUR + 'ms');
+  function bar() { root.classList.remove('run'); void root.offsetWidth; if (running()) root.classList.add('run'); }
+  const running = () => !userPaused && !hover && !focus && !document.hidden;
+  function go(n, manual) {
+    i = (n + slides.length) % slides.length;
+    track.style.transform = 'translateX(' + (-i * 100) + '%)';
+    slides.forEach((s, k) => { s.classList.toggle('on', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+    dots.forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+    schedule();
+  }
+  function schedule() { clearTimeout(timer); bar(); if (running()) timer = setTimeout(() => go(i + 1), DUR); }
+  function setPaused(p) {
+    userPaused = p; track.setAttribute('aria-live', p ? 'polite' : 'off');
+    btnP.setAttribute('aria-label', p ? 'Relancer les avis' : 'Mettre les avis en pause');
+    btnP.querySelector('use').setAttribute('href', p ? '#i-play' : '#i-pause'); schedule();
+  }
+  document.getElementById('tprev').onclick = () => go(i - 1, true);
+  document.getElementById('tnext').onclick = () => go(i + 1, true);
+  btnP.onclick = () => setPaused(!userPaused);
+  root.addEventListener('mouseenter', () => { hover = true; schedule(); }); root.addEventListener('mouseleave', () => { hover = false; schedule(); });
+  root.addEventListener('focusin', () => { focus = true; schedule(); }); root.addEventListener('focusout', () => { focus = false; schedule(); });
+  root.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  root.addEventListener('touchend', e => { if (x0 === null) return; const d = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(d) > 40) go(i + (d < 0 ? 1 : -1), true); });
+  root.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(i + 1, true); if (e.key === 'ArrowLeft') go(i - 1, true); });
+  document.addEventListener('visibilitychange', schedule);
+  new IntersectionObserver(es => { if (!es[0].isIntersecting) { clearTimeout(timer); root.classList.remove('run'); } else schedule(); }, { threshold: .2 }).observe(root);
+  setPaused(userPaused); go(0);
+})();
