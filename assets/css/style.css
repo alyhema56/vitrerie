@@ -231,12 +231,16 @@ html:not(.js) .marquee{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
 .mcard:focus-visible{outline:3px solid var(--cu);outline-offset:3px}
 .footer p a,.infos a{text-decoration:none}.footer p a:hover,.infos a:hover{text-decoration:underline}
 
-/* Logo HBS : pastille blanche dans l'en-tête sombre, carte blanche dans le pied de page */
-.logo{gap:.7rem}
-.logo-badge{display:flex;align-items:center;background:#fff;border-radius:8px;padding:4px 8px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-.logo-badge img{height:44px;width:auto}
-.logo-txt{font:700 1.5rem var(--hf);color:#fff}
-.foot-logo{display:inline-block;background:#fff;border-radius:10px;padding:.5rem .8rem;margin-bottom:.8rem}
-.foot-logo img{width:210px;max-width:100%;height:auto}
-@media(max-width:900px){.logo-txt{display:none}}
-@media(max-width:480px){.logo-badge img{height:38px}}
+/* Logo HBS : médaillon rond (anneau cuivre, ombre douce) ; en-tête = emblème qui déborde légèrement sous la barre, pied de page = logo complet */
+.logo{height:70px;gap:1rem}
+.logo-round{display:block;flex:none;width:88px;height:88px;border-radius:50%;background:#fff;border:3px solid var(--cu);overflow:hidden;
+  box-shadow:0 0 0 3px rgba(255,255,255,.9),0 8px 22px rgba(10,25,35,.38);transform:translateY(12px);transition:transform .25s,box-shadow .25s}
+.logo:hover .logo-round{transform:translateY(10px) scale(1.04)}
+.logo-round img{display:block;width:100%;height:100%;object-fit:cover}
+.logo-txt{font:700 1.5rem var(--hf);color:#fff;letter-spacing:.2px}
+.foot-logo{display:block;width:200px;height:200px;border-radius:50%;background:#fff;border:4px solid var(--cu);overflow:hidden;
+  box-shadow:0 0 0 5px rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.4);margin-bottom:1.2rem}
+.foot-logo img{display:block;width:100%;height:100%;object-fit:cover}
+@media(max-width:1100px){.logo-txt{display:none}}
+@media(max-width:600px){.logo-round{width:68px;height:68px;border-width:2px;transform:translateY(9px)}.foot-logo{width:170px;height:170px}}
+@media(prefers-reduced-motion:reduce){.logo:hover .logo-round{transform:translateY(12px)}}
