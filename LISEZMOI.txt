@@ -16,3 +16,6 @@ Changer un numéro : cherchez 74501181 (WhatsApp) et 71317922 (appel) dans les 3
 1) AVIS CLIENTS : carrousel automatique (un avis à la fois, 6 s, barre de progression, flèches, points, balayage au doigt, pause au survol et bouton pause). Pour ajouter un avis : dans index.html, copiez un bloc <figure class="tq"> dans #tslTrack et changez le texte, le nom, le métier et les initiales (le carrousel s'adapte tout seul). N'affichez que de vrais avis de clients.
 2) RESPONSABLE : nouvelle section « HEMA B Souleymane, responsable de l'atelier » juste après les avis, même disposition que « Un métier de précision ». Photo : images/responsable-atelier.webp (remplaçable en gardant le même nom). Textes modifiables dans index.html (#responsable).
 3) LOGO : nouveau logo rond remplacé dans images/logo-round-emblem.webp, logo-round.webp, logo.webp, favicon-32.png, apple-touch-icon.png.
+
+--- MISE À JOUR (version 8) ---
+SERVICES : les cartes de « Ce que nous fabriquons et posons » réagissent au toucher et au clic (rebond, icône animée, carte qui passe en bleu, onde de couleur). Une seule carte active à la fois ; re-toucher la referme. Réglages : fin de assets/css/style.css (bloc « Services : cartes qui réagissent »).

@@ -264,3 +264,22 @@ document.documentElement.classList.add('js');
   new IntersectionObserver(es => { if (!es[0].isIntersecting) { clearTimeout(timer); root.classList.remove('run'); } else schedule(); }, { threshold: .2 }).observe(root);
   setPaused(userPaused); go(0);
 })();
+
+/* Services : les cartes réagissent au toucher / au clic (une seule active à la fois, re-toucher la referme) */
+(function () {
+  const cards = Array.from(document.querySelectorAll('#services .card')); if (!cards.length) return;
+  const clear = () => cards.forEach(o => { o.classList.remove('act'); o.setAttribute('aria-pressed', 'false'); });
+  function toggle(c, x, y) {
+    const on = !c.classList.contains('act'); clear();
+    const r = document.createElement('span'); r.className = 'rip'; r.style.left = x + 'px'; r.style.top = y + 'px';
+    c.appendChild(r); r.addEventListener('animationend', () => r.remove());
+    if (on) { void c.offsetWidth; c.classList.add('act'); c.setAttribute('aria-pressed', 'true'); }
+  }
+  cards.forEach(c => {
+    c.tabIndex = 0; c.setAttribute('role', 'button'); c.setAttribute('aria-pressed', 'false');
+    c.addEventListener('transitionend', e => { if (e.propertyName === 'opacity') c.style.transitionDelay = ''; });  // le décalage de l'apparition ne ralentit plus les effets
+    c.addEventListener('click', e => { const b = c.getBoundingClientRect(); toggle(c, e.clientX - b.left, e.clientY - b.top); });
+    c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(c, c.offsetWidth / 2, c.offsetHeight / 2); } });
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('#services .card')) clear(); });
+})();

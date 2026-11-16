@@ -279,3 +279,17 @@ html:not(.js) .tsl-track{display:grid;gap:1rem}html:not(.js) .tq{opacity:1}html:
 .btn-wa{background:#25d366}.btn-wa:hover{background:#1da851;box-shadow:0 8px 20px rgba(37,211,102,.4)}
 #responsable .about-img img{aspect-ratio:8/9;object-position:50% 12%}
 #temoignages h2{text-align:center}
+
+/* ===== Services : cartes qui réagissent au toucher / au clic ===== */
+#services .card{cursor:pointer;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
+  transition:opacity .7s,transform .35s cubic-bezier(.2,1.4,.4,1),box-shadow .3s,background .3s,color .3s,border-color .3s}
+#services .card>.ic{transition:transform .35s cubic-bezier(.2,1.4,.4,1),color .3s;transform-origin:left center}
+#services .card:hover{transform:translateY(-6px)}
+#services .card:hover>.ic{transform:scale(1.15)}
+#services .card:active{transform:scale(.96)}
+#services .card.act{transform:translateY(-8px) scale(1.03);background:var(--steel);color:#fff;border-color:var(--cu);box-shadow:0 14px 34px rgba(20,35,45,.28)}
+#services .card.act h3{color:#fff}
+#services .card.act>.ic{color:#f3a56b;transform:scale(1.2);animation:icpop .6s}
+@keyframes icpop{0%{transform:scale(1)}40%{transform:scale(1.7) rotate(-14deg)}70%{transform:scale(.95) rotate(7deg)}100%{transform:scale(1.2)}}
+.rip{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:rgba(200,104,42,.4);transform:scale(0);animation:rip .65s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(22);opacity:0}}
